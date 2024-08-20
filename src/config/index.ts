@@ -2,7 +2,7 @@ import axios from "axios";
 import { getCookies } from "../utils/cocies";
 
 const http = axios.create({
-    baseURL: "http://15.237.118.112:8080"
+    baseURL: "https://api.nordik-tadqiqot.uz"
 })
 
 
