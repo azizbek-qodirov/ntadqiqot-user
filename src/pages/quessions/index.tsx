@@ -7,25 +7,25 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { toast, ToastContainer } from "react-toastify";
 
 function Index() {
-  const { menu_id }: any = MenuIds();
-  const [data, setData]: any = useState([]);
-  const [variant, setVariant]: any = useState([]);
-  const [answers, setAnswers]: any = useState<{ question_id: string; answer_point: number }[]>([]);
-  const [poll, setPoll]: any = useState([]);
+  const { menu_id }:any = MenuIds(); 
+  const [data, setData] = useState<any[]>([]); 
+  const [variant, setVariant] = useState<any[]>([]);
+  const [answers, setAnswers] = useState<{ question_id: string; answer_point: number }[]>([]);
+  const [poll, setPoll] = useState<any>({});
   const [load, setLoad] = useState(false);
   
-  const [form] = Form.useForm(); // Create a form instance
+  const [form] = Form.useForm(); 
 
   async function getData() {
     try {
       if (menu_id) {
         const response = await http.get(`/questions/${menu_id}`);
-        setPoll(response?.data?.poll);
-        setData(response?.data?.question);
-        setVariant(response?.data?.poll?.options);
+        setPoll(response?.data?.poll || {}); 
+        setData(response?.data?.question || []);
+        setVariant(response?.data?.poll?.options || []); 
       }
     } catch (e) {
-      console.log(e);
+      console.error('Error fetching data:', e);
     }
   }
 
@@ -33,13 +33,13 @@ function Index() {
     getData();
   }, [menu_id]);
 
-  const getLetter = (index: number) => {
-    return String.fromCharCode(65 + index); // 65 is the ASCII code for 'A'
-  };
+  // Generate letter labels for options
+  const getLetter = (index: number) => String.fromCharCode(65 + index);
 
+  // Handle changes in selected answers
   const handleAnswerChange = (question_id: string, answer_point: number) => {
-    setAnswers((prevAnswers: any) => {
-      const existingAnswerIndex = prevAnswers.findIndex((answer: any) => answer.question_id === question_id);
+    setAnswers(prevAnswers => {
+      const existingAnswerIndex = prevAnswers.findIndex(answer => answer.question_id === question_id);
       if (existingAnswerIndex !== -1) {
         const updatedAnswers = [...prevAnswers];
         updatedAnswers[existingAnswerIndex] = { question_id, answer_point };
@@ -49,14 +49,8 @@ function Index() {
     });
   };
 
-  useEffect(() => {
-    setLoad(true);
-    setTimeout(() => {
-      setLoad(false);
-    }, 700);
-  }, [menu_id]);
-
-  const handleSubmit = async () => {
+  // Handle form submission
+  const handleSubmit = async (_: any) => {
     const payload = {
       answers: answers,
       poll_id: poll?.id,
@@ -70,9 +64,16 @@ function Index() {
       }
     } catch (err) {
       toast.error("Ushbu sizning testingizni tasdiqlashda xatolik yuz berdi!", { autoClose: 1500 });
-      console.log(err);
+      console.error('Error submitting answers:', err);
     }
   };
+
+  useEffect(() => {
+    if (menu_id) {
+      setLoad(true);
+      setTimeout(() => setLoad(false), 700);
+    }
+  }, [menu_id]);
 
   return (
     load ? (
@@ -84,41 +85,45 @@ function Index() {
         <ToastContainer />
         <div className="question">
           <h2 style={{ textAlign: 'center', marginBottom: 40 }}>{poll?.title}</h2>
-          <Form form={form} onFinish={handleSubmit}>
-            {data?.map((e: any, i: number) => (
-              <div key={i} className="test">
-                <p>{i + 1}. {e.content}</p>
-                <Form.Item
-                  name={`answer${i}`}
-                  rules={[{
-                    required: true,
-                    message: "Iltimos savollarni to'ldiring!",
-                  }]}
-                >
-                  <Radio.Group
-                    className="radio"
-                    size="large"
-                    onChange={(event) => handleAnswerChange(e.id, event.target.value)}
+          {data.length > 0 ? (
+            <Form form={form} onFinish={handleSubmit}>
+              {data.map((e, i) => (
+                <div key={i} className="test">
+                  <p>{i + 1}. {e.content}</p>
+                  <Form.Item
+                    name={`answer${i}`}
+                    rules={[{
+                      required: true,
+                      message: "Iltimos savollarni to'ldiring!",
+                    }]}
                   >
-                    {variant?.map((variant: any, index: number) => (
-                      <Radio key={index} value={variant?.ball}>
-                        {`${getLetter(index)}. ${variant?.variant}`}
-                      </Radio>
-                    ))}
-                  </Radio.Group>
-                </Form.Item>
-              </div>
-            ))}
-            {menu_id && (
-              <Button
-                style={{ display: 'block', width: '100%', maxWidth: 100, margin: '0 auto' }}
-                type="primary"
-                htmlType="submit"
-              >
-                Tasdiqlash
-              </Button>
-            )}
-          </Form>
+                    <Radio.Group
+                      className="radio"
+                      size="large"
+                      onChange={(event) => handleAnswerChange(e.id, event.target.value)}
+                    >
+                      {variant.map((option, index) => (
+                        <Radio key={index} value={option?.ball}>
+                          {`${getLetter(index)}. ${option?.variant}`}
+                        </Radio>
+                      ))}
+                    </Radio.Group>
+                  </Form.Item>
+                </div>
+              ))}
+              {menu_id && (
+                <Button
+                  style={{ display: 'block', width: '100%', maxWidth: 100, margin: '0 auto' }}
+                  type="primary"
+                  htmlType="submit"
+                >
+                  Tasdiqlash
+                </Button>
+              )}
+            </Form>
+          ) : (
+            <p style={{textAlign: 'center', fontSize: 20, fontWeight: 600}}>Savollar mavjud emas !</p>
+          )}
         </div>
       </>
     )
