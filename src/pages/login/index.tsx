@@ -23,8 +23,8 @@ function Login() {
           navigate('/dashboard')
         }, 2000);
       }
-    }catch(err){
-      console.log(err);
+    }catch(err:any){
+      toast.error(err?.response?.data?.error == 'email' ? 'Email xato kiritildi' : 'Password xato kiritild')
     }
     setLoadi(true)
     setTimeout(() => {
@@ -95,6 +95,7 @@ function Login() {
           </div>
         </div>
       </div>
+      
     </>
   );
 }

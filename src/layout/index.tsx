@@ -17,18 +17,34 @@ import Sider from "antd/es/layout/Sider";
 const { Header, Content, Footer } = Layout;
 
 const App: React.FC = () => {
-  const [data, setData]: any = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const { changeMenu_id }: any = MenuIds();
   const navigate = useNavigate();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  const siderStyle: React.CSSProperties = {
+    height: '100vh',
+    position: 'fixed',
+    insetInlineStart: 0,
+    top: 0,
+    bottom: 0,
+    scrollbarWidth: 'thin',
+    scrollbarColor: 'unset',
+    marginTop: 100,
+    background: 'white',
+    zIndex: 99,
+    paddingBottom: 150
+  };
+
   async function getMenuData() {
     try {
       const response = await http.get("/polls");
-      setData(response?.data?.poll);
-    } catch (err) {}
+      setData(response?.data?.poll || []);
+    } catch (err) {
+      console.error("Error fetching menu data:", err);
+    }
   }
 
   function logout() {
@@ -37,8 +53,12 @@ const App: React.FC = () => {
   }
 
   async function getUserData() {
-    const response = await http.get("/profile");
-    localStorage.setItem("user_id", response?.data?.id);
+    try {
+      const response = await http.get("/profile");
+      localStorage.setItem("user_id", response?.data?.id || "");
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+    }
   }
 
   useEffect(() => {
@@ -48,12 +68,11 @@ const App: React.FC = () => {
     }
     getMenuData();
     getUserData();
-  }, []);
-
+  }, [navigate]);
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Header className="header">
+      <Header className="header" style={{ position: 'fixed', zIndex: 999, width: '100%' }}>
         <div
           onClick={() => navigate("/dashboard")}
           style={{ cursor: "pointer" }}
@@ -64,7 +83,7 @@ const App: React.FC = () => {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Button
-            onClick={() => logout()}
+            onClick={logout}
             className="logout"
             style={{ display: "flex", alignItems: "center" }}
           >
@@ -75,8 +94,8 @@ const App: React.FC = () => {
       </Header>
       <Layout>
         <Sider
-          style={{background: 'transparent', minHeight: "600px"}}
-          breakpoint="lg"
+          style={siderStyle}
+          breakpoint="xl"
           width={200}
           collapsedWidth="0"
           onBreakpoint={(broken) => {
@@ -86,15 +105,14 @@ const App: React.FC = () => {
             console.log(collapsed, type);
           }}
         >
-          <Menu style={{height: '100%'}}>
-            {data?.map((e: any, i: number) => {
-              return (
-                <Menu.Item key={i} onClick={() => changeMenu_id(e.id)}>
-                  {e.title}
-                </Menu.Item>
-              );
-            })}
-          </Menu>
+          <Menu
+            style={{ height: '100%' }}
+            items={data.map((e: any, i: number) => ({
+              key: i,
+              onClick: () => changeMenu_id(e.id),
+              label: e.title
+            }))}
+          />
         </Sider>
         <Content
           style={{
@@ -102,6 +120,7 @@ const App: React.FC = () => {
             maxWidth: "1200px",
             margin: "0 auto",
             padding: "0 50px",
+            paddingTop: 100,
           }}
         >
           <div
@@ -113,69 +132,24 @@ const App: React.FC = () => {
             }}
           >
             <Outlet />
-
-            {/* <div className="about">
-              <p>Hurmatli do'stlar,</p>
-              <p>
-                Mening ismim <strong>Yuldasheva Nilufar</strong>. Psixolog
-                sifatida tadqiqot sohasida faoliyat yuritaman va{" "}
-                <strong>PhD</strong> ilmiy darajasiga egaman. Hozirda Xalqaro{" "}
-                <strong>Nordik</strong> Universitetida katta o‘qituvchi sifatida
-                dars beraman.
-              </p>
-              <p>
-                Men asosan kognitiv psixologiya, tadqiqot metodologiyasi va
-                psixodiagnostika sohalarida tadqiqotlar olib boraman. Ilmiy
-                ishlarimda zamonaviy psixologik usullar va vositalardan
-                foydalanishga alohida e'tibor beraman. Shuningdek, yosh olimlar
-                va tadqiqotchilar bilan o‘z bilim va tajribalarimni ulashishdan
-                mamnunman.
-              </p>
-              <p>
-                Mening elektron pochta manzilim:{" "}
-                <strong>
-                  <a href="mailto:nilukhanscience@mail.ru" target="_blank">
-                    nilukhanscience@mail.ru
-                  </a>
-                </strong>
-                . Agar savollar yoki hamkorlikka qiziqish bildirsangiz, menga
-                istalgan vaqtda telegram orqali{" "}
-                <strong>
-                  <a href="https://tme/cognitivist1" target="_blank">
-                    @cognitivist1
-                  </a>
-                </strong>{" "}
-                manzilidan murojaat qilishingiz mumkin.
-              </p>
-              <p>
-                Hurmat bilan,
-                <br />
-                Yuldasheva Nilufar
-                <br />
-                Psixolog, tadqiqotchi, PhD
-                <br />
-                Xalqaro Nordik Universiteti katta o‘qituvchisi
-              </p>
-            </div> */}
           </div>
         </Content>
       </Layout>
-        <Footer style={{ textAlign: "center" }}>
-            <div className="footer-wrapper">
-            
-              <div className="footer-one">
-                <div>
-                  <img src={Logo} alt="LOGO" />
-                  <p>Researchpsy</p>
-                </div>
-               <div>
-                <a href="#"><InstagramOutlined/> Instagram</a>
-                  <a href="#"><SendOutlined/> Telegram</a>
-                  <a href="#"><FacebookOutlined/> Facebook</a>
-               </div>
-              </div>
+      <Footer style={{ textAlign: "center" }}>
+        <div className="footer-wrapper">
+          <div className="footer-one">
+            <div>
+              <img src={Logo} alt="LOGO" />
+              <p>Researchpsy</p>
             </div>
-        </Footer>
+            <div>
+              <a href="#"><InstagramOutlined /> Instagram</a>
+              <a href="#"><SendOutlined /> Telegram</a>
+              <a href="#"><FacebookOutlined /> Facebook</a>
+            </div>
+          </div>
+        </div>
+      </Footer>
     </Layout>
   );
 };

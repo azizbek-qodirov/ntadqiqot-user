@@ -39,6 +39,8 @@
 }
 
 .footer-wrapper{
+    position: relative;
+    z-index: 999999;
     border-radius: 12px;
     background: #001529;
     display: flex;

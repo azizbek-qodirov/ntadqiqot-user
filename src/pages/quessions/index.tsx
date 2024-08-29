@@ -1,7 +1,7 @@
 import { MenuIds } from "@store";
 import { useEffect, useState } from "react";
 import http from "../../config";
-import { Button, Form, Radio, Spin } from "antd";
+import { Button, Form, Modal, Radio, Spin } from "antd";
 import './style.scss';
 import { LoadingOutlined } from "@ant-design/icons";
 import { toast, ToastContainer } from "react-toastify";
@@ -13,6 +13,22 @@ function Index() {
   const [answers, setAnswers] = useState<{ question_id: string; answer_point: number }[]>([]);
   const [poll, setPoll] = useState<any>({});
   const [load, setLoad] = useState(false);
+  const [feedback, setFeedback] = useState("")
+  
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   
   const [form] = Form.useForm(); 
 
@@ -33,10 +49,9 @@ function Index() {
     getData();
   }, [menu_id]);
 
-  // Generate letter labels for options
   const getLetter = (index: number) => String.fromCharCode(65 + index);
 
-  // Handle changes in selected answers
+
   const handleAnswerChange = (question_id: string, answer_point: number) => {
     setAnswers(prevAnswers => {
       const existingAnswerIndex = prevAnswers.findIndex(answer => answer.question_id === question_id);
@@ -49,7 +64,6 @@ function Index() {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (_: any) => {
     const payload = {
       answers: answers,
@@ -59,7 +73,8 @@ function Index() {
     try {
       const response = await http.post('/send-answers', payload);
       if (response.status === 201) {
-        toast.success("Sizning testingiz yuborildi! Natijani elektron pochtangizga sms holatda yuboramiz. Rahmat :)", { autoClose: 10000 });
+        setFeedback(response?.data?.feedback)
+        showModal()
         form.resetFields(); 
       }
     } catch (err) {
@@ -125,6 +140,10 @@ function Index() {
             <p style={{textAlign: 'center', fontSize: 20, fontWeight: 600}}>Savollar mavjud emas !</p>
           )}
         </div>
+
+        <Modal title="Javob" open={isModalOpen} onOk={handleOk} footer={false} onCancel={handleCancel}>
+            <p>{feedback}</p>
+        </Modal>
       </>
     )
   );

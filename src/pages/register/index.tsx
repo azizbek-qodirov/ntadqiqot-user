@@ -165,8 +165,8 @@ function Login() {
                 hasFeedback
                 rules={[
                   { required: true, message: "Iltimos parolingizni kiriting !" },
-                  { min: 6, message: "Parolingiz 6 tadan kam bo'lmasin" },
-                  { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/, message: "Parolingizda 1 ta katta harf, kichik harf, 1 ta belgi, va sonlar qatnashsin !" },
+                  { min: 8, message: "Parolingiz 8 tadan kam bo'lmasin" },
+                  { pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/, message: "Murakkab parol qo'ying. Parolingiz juda oson" },
                 ]}
               >
                 <Input.Password size="large" name="password" placeholder="password" />
