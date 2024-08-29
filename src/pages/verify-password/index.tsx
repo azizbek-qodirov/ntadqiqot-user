@@ -33,15 +33,21 @@ const App: React.FC = () => {
   };
 
   async function resetVerify(){
-    console.log(1);
     setMinut(4)
     setSecund(59)
-    const response = await http.post('/resverify',  localStorage.getItem('email'))
+    const response = await http.post('/resverify',  {email: localStorage.getItem('email')})
     if(response.status == 200){
       toast.success('Sizga qayta Cod yuborildi!', { autoClose: 1200 });
     }
-  
   }
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      navigate('/'); 
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  }, [navigate]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
