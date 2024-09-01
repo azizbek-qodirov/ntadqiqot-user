@@ -6,10 +6,9 @@ import http from "../config";
 import { Outlet, useNavigate } from "react-router-dom";
 import { MenuIds } from "@store";
 import {
-  FacebookOutlined,
-  InstagramOutlined,
+  EnvironmentOutlined,
   LogoutOutlined,
-  SendOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 import { getCookies, removeCookies } from "../utils/cocies";
 import Sider from "antd/es/layout/Sider";
@@ -21,21 +20,21 @@ const App: React.FC = () => {
   const { changeMenu_id }: any = MenuIds();
   const navigate = useNavigate();
   const {
-    token: { colorBgContainer, borderRadiusLG },
+    token: { borderRadiusLG },
   } = theme.useToken();
 
   const siderStyle: React.CSSProperties = {
-    height: '100vh',
-    position: 'fixed',
+    height: "100vh",
+    position: "fixed",
     insetInlineStart: 0,
     top: 0,
     bottom: 0,
-    scrollbarWidth: 'thin',
-    scrollbarColor: 'unset',
+    scrollbarWidth: "thin",
+    scrollbarColor: "unset",
     marginTop: 100,
-    background: 'white',
+    background: "#FFF",
     zIndex: 99,
-    paddingBottom: 150
+    paddingBottom: 150,
   };
 
   async function getMenuData() {
@@ -72,7 +71,15 @@ const App: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Header className="header" style={{ position: 'fixed', zIndex: 999, width: '100%' }}>
+      <Header
+        className="header"
+        style={{
+          position: "fixed",
+          zIndex: 999,
+          width: "100%",
+          background: "#0C3B2E",
+        }}
+      >
         <div
           onClick={() => navigate("/dashboard")}
           style={{ cursor: "pointer" }}
@@ -96,7 +103,7 @@ const App: React.FC = () => {
         <Sider
           style={siderStyle}
           breakpoint="xl"
-          width={200}
+          width={250}
           collapsedWidth="0"
           onBreakpoint={(broken) => {
             console.log(broken);
@@ -106,11 +113,17 @@ const App: React.FC = () => {
           }}
         >
           <Menu
-            style={{ height: '100%' }}
+            style={{
+              height: "100%",
+              fontSize: 18,
+              fontWeight: "semibold",
+              background: "white",
+              color: "white",
+            }}
             items={data.map((e: any, i: number) => ({
               key: i,
               onClick: () => changeMenu_id(e.id),
-              label: e.title
+              label: e.title,
             }))}
           />
         </Sider>
@@ -121,11 +134,14 @@ const App: React.FC = () => {
             margin: "0 auto",
             padding: "0 50px",
             paddingTop: 100,
+            paddingBottom: 160,
+            color: "black",
           }}
         >
           <div
             style={{
-              background: colorBgContainer,
+              marginTop: 20,
+              background: "white",
               minHeight: 600,
               padding: 24,
               borderRadius: borderRadiusLG,
@@ -135,17 +151,43 @@ const App: React.FC = () => {
           </div>
         </Content>
       </Layout>
-      <Footer style={{ textAlign: "center" }}>
+      <Footer
+        style={{
+          textAlign: "center",
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          width: "100%",
+          zIndex: 999999,
+        }}
+      >
         <div className="footer-wrapper">
           <div className="footer-one">
             <div>
               <img src={Logo} alt="LOGO" />
               <p>Researchpsy</p>
             </div>
-            <div>
-              <a href="#"><InstagramOutlined /> Instagram</a>
-              <a href="#"><SendOutlined /> Telegram</a>
-              <a href="#"><FacebookOutlined /> Facebook</a>
+            <div className="adress">
+              <a
+                href="mailto:nilukhanphd1@gmail.com"
+                style={{
+                  display: "flex",
+                  gap: "5px",
+                  alignItems: "center",
+                  textDecoration: "none",
+                  color: "inherit",
+                }}
+              >
+                <MailOutlined style={{ fontSize: "20px", color: 'white' }} />
+                <p style={{ fontSize: "12px", margin: 0 }}>
+                  nilukhanphd1@gmail.com
+                </p>
+              </a>
+              
+              <p style={{fontSize: 12, display: 'flex', gap: 5, alignItems: 'center'}}>
+              <EnvironmentOutlined style={{fontSize: 20}}/>
+              International Nordic University, Sebzor 22A
+              </p>
             </div>
           </div>
         </div>
