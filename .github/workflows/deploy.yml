@@ -48,4 +48,4 @@ jobs:
             log_error "---------------- PROJECT STOPPED -----------------"
             sudo docker compose build
             sudo docker compose up --build -d
-            log_success "---------------- API-GATEWAY SERVICE STARTED ----------------" 
+            log_success "---------------- API-GATEWAY SERVICE STARTED ----------------"
